@@ -11,20 +11,20 @@ class BinTree
         nodo *hijoDer;
     };
 
-    nodo raiz;
+    nodo* raiz;
 
 public:
     BinTree() {}
     BinTree(string cadena)
     {
-        if (cadena.length() > 0)
+        /*if (cadena.length() > 0)
         {
             raiz.etiqueta = cadena[0];
             raiz.hijoDer = nullptr;
             raiz.hijoIzq = nullptr;
             raiz.padre = nullptr;
 
-            cadena.erase(0, 1); 
+            cadena.erase(0, 1);
             auto it = cadena.begin();
             auto it2 = cadena.begin();
             nodo *actual = &raiz;
@@ -60,9 +60,28 @@ public:
                         ++it;
                     }
                 }
-
             }
+        }*/
+        int pos = 0;
+        raiz = construir(cadena, pos, nullptr);
+    }
+
+    nodo* construir(string &cadena, int &pos, nodo* padre)
+    {
+        char c = cadena[pos];
+        pos++;
+        nodo *nuevo = nullptr;
+
+        if (c != '#')
+        {
+            nuevo = new nodo;
+            nuevo->etiqueta = c;
+            nuevo->padre = padre;
+            nuevo->hijoIzq = construir(cadena, pos, nuevo);
+            nuevo->hijoDer = construir(cadena, pos, nuevo);
         }
+
+        return nuevo;
     }
 
     void inorden(nodo *actual)
@@ -71,16 +90,16 @@ public:
             return;
 
         inorden(actual->hijoIzq);
-        cout << actual->etiqueta << " "; 
-        inorden(actual->hijoDer);        
+        cout << actual->etiqueta << " ";
+        inorden(actual->hijoDer);
     }
 
     void mostrarInorden()
     {
-        inorden(&raiz);
+        inorden(raiz);
         cout << endl;
     }
-    void crearHijoIzq(nodo *padre, char etiqueta)
+    /*void crearHijoIzq(nodo *padre, char etiqueta)
     {
         nodo *nuevo = new nodo;
         nuevo->etiqueta = etiqueta;
@@ -97,7 +116,7 @@ public:
         padre->hijoDer = nuevo;
         nuevo->hijoIzq = nullptr;
         nuevo->hijoDer = nullptr;
-    }
+    }*/
 };
 void leerEntrada(string &cadena)
 {
