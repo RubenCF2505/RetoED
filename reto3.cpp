@@ -13,7 +13,7 @@ class BinTree
         nodo *hijoDer;
     };
 
-    nodo* raiz;
+    nodo *raiz;
 
 public:
     BinTree() {}
@@ -68,45 +68,50 @@ public:
         raiz = construir(cadena, pos, nullptr);
     }
 
-    nodo* construir(string &cadena, int &pos, nodo* padre)
+    nodo *construir(string &cadena, int &pos, nodo *padre)
     {
-        char c = cadena[pos];
-        pos++;
         nodo *nuevo = nullptr;
-
-        if (pos < cadena.size() && cadena[pos] == '.')
+        if (pos < cadena.size())
         {
+            char c = cadena[pos];
             pos++;
-            nuevo = new nodo;
-            nuevo->etiqueta = c;
-            nuevo->padre = padre;
-            nuevo->hijoIzq = nullptr;
-            nuevo->hijoDer = nullptr;
-        }
-        else if (pos < cadena.size() && c != '#' && c != '.')
-        {
-            nuevo = new nodo;
-            nuevo->etiqueta = c;
-            nuevo->padre = padre;
-            nuevo->hijoIzq = construir(cadena, pos, nuevo);
-            nuevo->hijoDer = construir(cadena, pos, nuevo);
+
+            if (cadena[pos] == '.')
+            {
+                pos++;
+                nuevo = new nodo;
+                nuevo->etiqueta = c;
+                nuevo->padre = padre;
+                nuevo->hijoIzq = nullptr;
+                nuevo->hijoDer = nullptr;
+            }
+            else if (c != '#' && c != '.')
+            {
+                nuevo = new nodo;
+                nuevo->etiqueta = c;
+                nuevo->padre = padre;
+                nuevo->hijoIzq = construir(cadena, pos, nuevo);
+                nuevo->hijoDer = construir(cadena, pos, nuevo);
+            }
         }
 
         return nuevo;
     }
 
-    void guardaArbol(ofstream &out, nodo* actual)
+    void guardaArbol(ofstream &out, nodo *actual)
     {
         bool esHijoVacio = (actual == nullptr);
-        bool esHoja = (actual->hijoIzq == nullptr && actual->hijoDer == nullptr);
+        bool esHoja = esHijoVacio ? true : (actual->hijoIzq == nullptr && actual->hijoDer == nullptr);
 
         if (esHijoVacio)
         {
             out << "#";
-        } else if (esHoja && !esHijoVacio)
+        }
+        else if (esHoja && !esHijoVacio)
         {
             out << actual->etiqueta << ".";
-        } else // Nodo con hijos
+        }
+        else // Nodo con hijos
         {
             out << actual->etiqueta;
             guardaArbol(out, actual->hijoIzq);
@@ -124,6 +129,22 @@ public:
         }
         guardaArbol(out, raiz);
         out.close();
+    }
+
+    void leerArchivo(const string &nombre)
+    {
+        ifstream in(nombre);
+        if (!in)
+        {
+            cerr << "Error abriendo archivo\n";
+            return;
+        }
+        string contenido;
+        getline(in, contenido);
+        in.close();
+
+        int pos = 0;
+        raiz = construir(contenido, pos, nullptr);
     }
 
     void inorden(nodo *actual)
@@ -164,12 +185,26 @@ public:
 int main(int argc, char **args)
 {
     string cadena = args[1];
-    BinTree arbol(cadena);
 
+    int entrada = -1;
+    do
+    {
+        cout << endl << "Se ha ingresado [0: Arbol directamente] [1: Archivo de texto con el arbol]?: ";
+        cin >> entrada;
+    } while (entrada > 1 || entrada < 0);
+    
+    BinTree arbol;
+    if (entrada == 0) arbol = BinTree(cadena);
+    else arbol.leerArchivo(cadena);
+   
+
+    cout << "Recorrido inorden: ";
     arbol.mostrarInorden();
 
     string nombreArchivo = "arbol.txt";
     arbol.guardarArchivo(nombreArchivo);
+
+    cout << endl << "Arbol guardado en " << nombreArchivo << endl;
 
     return 0;
 }
