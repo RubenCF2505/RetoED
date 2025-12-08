@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 using namespace std;
 
 class BinTree
@@ -72,7 +74,16 @@ public:
         pos++;
         nodo *nuevo = nullptr;
 
-        if (c != '#')
+        if (pos < cadena.size() && cadena[pos] == '.')
+        {
+            pos++;
+            nuevo = new nodo;
+            nuevo->etiqueta = c;
+            nuevo->padre = padre;
+            nuevo->hijoIzq = nullptr;
+            nuevo->hijoDer = nullptr;
+        }
+        else if (pos < cadena.size() && c != '#' && c != '.')
         {
             nuevo = new nodo;
             nuevo->etiqueta = c;
@@ -82,6 +93,37 @@ public:
         }
 
         return nuevo;
+    }
+
+    void guardaArbol(ofstream &out, nodo* actual)
+    {
+        bool esHijoVacio = (actual == nullptr);
+        bool esHoja = (actual->hijoIzq == nullptr && actual->hijoDer == nullptr);
+
+        if (esHijoVacio)
+        {
+            out << "#";
+        } else if (esHoja && !esHijoVacio)
+        {
+            out << actual->etiqueta << ".";
+        } else // Nodo con hijos
+        {
+            out << actual->etiqueta;
+            guardaArbol(out, actual->hijoIzq);
+            guardaArbol(out, actual->hijoDer);
+        }
+    }
+
+    void guardarArchivo(const string &nombre)
+    {
+        ofstream out(nombre);
+        if (!out)
+        {
+            cerr << "Error abriendo archivo\n";
+            return;
+        }
+        guardaArbol(out, raiz);
+        out.close();
     }
 
     void inorden(nodo *actual)
@@ -118,14 +160,16 @@ public:
         nuevo->hijoDer = nullptr;
     }*/
 };
-void leerEntrada(string &cadena)
-{
-    BinTree arbol(cadena);
-    arbol.mostrarInorden();
-}
+
 int main(int argc, char **args)
 {
     string cadena = args[1];
-    leerEntrada(cadena);
+    BinTree arbol(cadena);
+
+    arbol.mostrarInorden();
+
+    string nombreArchivo = "arbol.txt";
+    arbol.guardarArchivo(nombreArchivo);
+
     return 0;
 }
