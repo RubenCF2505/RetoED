@@ -5,6 +5,7 @@ using namespace std;
 
 class BinTree
 {
+private:
     struct nodo
     {
         char etiqueta;
@@ -14,56 +15,32 @@ class BinTree
     };
 
     nodo *raiz;
+    
+    void guardaArbol(ofstream &out, nodo *actual)
+    {
+        bool esHijoVacio = (actual == nullptr);
+        bool esHoja = esHijoVacio ? true : (actual->hijoIzq == nullptr && actual->hijoDer == nullptr);
+
+        if (esHijoVacio)
+        {
+            out << "#";
+        }
+        else if (esHoja && !esHijoVacio)
+        {
+            out << actual->etiqueta << ".";
+        }
+        else // Nodo con hijos
+        {
+            out << actual->etiqueta;
+            guardaArbol(out, actual->hijoIzq);
+            guardaArbol(out, actual->hijoDer);
+        }
+    }
 
 public:
     BinTree() {}
     BinTree(string cadena)
     {
-        /*if (cadena.length() > 0)
-        {
-            raiz.etiqueta = cadena[0];
-            raiz.hijoDer = nullptr;
-            raiz.hijoIzq = nullptr;
-            raiz.padre = nullptr;
-
-            cadena.erase(0, 1);
-            auto it = cadena.begin();
-            auto it2 = cadena.begin();
-            nodo *actual = &raiz;
-
-            while (it != cadena.end())
-            {
-
-                if (*it != '#')
-                {
-                    crearHijoIzq(actual, *it);
-                    actual = actual->hijoIzq;
-
-                    ++it;
-                    ++it2;
-                }
-                else
-                {
-                    ++it2;
-                    if (it2 != cadena.end() && *it2 != '#')
-                    {
-                        crearHijoDer(actual, *it2);
-                        actual = actual->hijoDer;
-
-                        ++it;
-                        ++it2;
-                    }
-                    else
-                    {
-                        actual = actual->padre;
-
-                        if (it2 != cadena.end())
-                            ++it2;
-                        ++it;
-                    }
-                }
-            }
-        }*/
         int pos = 0;
         raiz = construir(cadena, pos, nullptr);
     }
@@ -98,26 +75,7 @@ public:
         return nuevo;
     }
 
-    void guardaArbol(ofstream &out, nodo *actual)
-    {
-        bool esHijoVacio = (actual == nullptr);
-        bool esHoja = esHijoVacio ? true : (actual->hijoIzq == nullptr && actual->hijoDer == nullptr);
-
-        if (esHijoVacio)
-        {
-            out << "#";
-        }
-        else if (esHoja && !esHijoVacio)
-        {
-            out << actual->etiqueta << ".";
-        }
-        else // Nodo con hijos
-        {
-            out << actual->etiqueta;
-            guardaArbol(out, actual->hijoIzq);
-            guardaArbol(out, actual->hijoDer);
-        }
-    }
+    // Funciones relacionadas con Ficheros --------------------------------------------
 
     void guardarArchivo(const string &nombre)
     {
@@ -147,6 +105,8 @@ public:
         raiz = construir(contenido, pos, nullptr);
     }
 
+    // Representación Arbol ----------------------------------------
+
     void inorden(nodo *actual)
     {
         if (actual == nullptr)
@@ -162,25 +122,9 @@ public:
         inorden(raiz);
         cout << endl;
     }
-    /*void crearHijoIzq(nodo *padre, char etiqueta)
-    {
-        nodo *nuevo = new nodo;
-        nuevo->etiqueta = etiqueta;
-        nuevo->padre = padre;
-        padre->hijoIzq = nuevo;
-        nuevo->hijoIzq = nullptr;
-        nuevo->hijoDer = nullptr;
-    }
-    void crearHijoDer(nodo *padre, char etiqueta)
-    {
-        nodo *nuevo = new nodo;
-        nuevo->etiqueta = etiqueta;
-        nuevo->padre = padre;
-        padre->hijoDer = nuevo;
-        nuevo->hijoIzq = nullptr;
-        nuevo->hijoDer = nullptr;
-    }*/
 };
+
+//********************************************************************************
 
 int main(int argc, char **args)
 {
@@ -189,7 +133,7 @@ int main(int argc, char **args)
     int entrada = -1;
     do
     {
-        cout << endl << "Se ha ingresado [0: Arbol directamente] [1: Archivo de texto con el arbol]?: ";
+        cout << "Se ha ingresado [0: Arbol directamente] [1: Archivo de texto con el arbol]?: ";
         cin >> entrada;
     } while (entrada > 1 || entrada < 0);
     
